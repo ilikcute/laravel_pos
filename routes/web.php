@@ -12,4 +12,11 @@ Route::get('/dashboard/users', [DashboardController::class, 'users'])->name('das
 Route::resource('/dashboard/roles', RoleController::class)->middleware(CheckPermissionMiddleware::class);
 Route::resource('/dashboard/permission', PermissionController::class)->middleware(CheckPermissionMiddleware::class);
 
-require __DIR__.'/auth.php';
+//Role Access
+
+Route::get('/dashboard/permission-role/{role_id}', [PermissionController::class, 'permission_role'])->name('permission_role.index')->middleware(CheckPermissionMiddleware::class);
+Route::post('/dashboard/permisison-role/{role_id}', [PermissionController::class, 'permission_role_update'])->name('permission_role.update')->middleware(CheckPermissionMiddleware::class);
+
+
+
+require __DIR__ . '/auth.php';
