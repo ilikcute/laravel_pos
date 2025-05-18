@@ -65,6 +65,12 @@
                                                 <td>{{ $role->created_at->format('d M Y') }}</td>
                                                 <td>
                                                     <div class="d-flex justify-content-start gap-3">
+                                                        @if($role->name !== 'Admin')
+                                                            <a href="/dashboard/permission-role/{{ $role->id }}"
+                                                                class="btn btn-primary">
+                                                                Access
+                                                            </a>                                                            
+                                                        @endif
                                                         <a href="/dashboard/roles/{{ $role->id }}/edit"
                                                             class="btn btn-warning">
                                                             Edit

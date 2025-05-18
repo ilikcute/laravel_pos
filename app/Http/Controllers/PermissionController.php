@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Permission;
 use Illuminate\Http\Request;
+use App\Models\PermissionRole;
 
 class PermissionController extends Controller
 {
@@ -100,5 +101,60 @@ class PermissionController extends Controller
     {
         $permission->delete();
         return redirect('/dashboard/permission')->with('success', 'Permission deleted successfully.');
+    }
+
+    // permission Role
+
+    public function permission_role($role_id)
+    {
+        // ambil semua permission
+        $permissions = Permission::all();
+        // ambil permission yang sudah ada  di role
+        $role_permissions = PermissionRole::with(['permission'])
+            ->where('role_id', $role_id)
+            ->get();
+
+        // buat variable untuk mengirimkan ke front end
+        $data = [
+            'role_id' => $role_id,
+            'role_permissions' => $role_permissions,
+            'permissions' => $permissions,
+            'title' => 'Role Akses',
+        ];
+
+        return view('role_access.index', compact('data'));
+    }
+
+    public function permission_role_update(Request $request, $role_id)
+    {
+        // Validasi Input
+        $validated = $request->validate([
+            'permissions' => 'array',
+            'permissions.*' => 'exists:permissions,id',
+        ]);
+
+
+        // Hapus Semua Permission yang ada Sebelumnya (Cleaning)
+        PermissionRole::where('role_id', $role_id)->delete();
+
+
+        // Input Data yang Baru Lagi
+        $permissions = $request->input('permissions', []);
+
+
+        // Looping untuk Update Data
+        $insertData = collect($permissions)->map(function ($permission_id) use ($role_id) {
+            return [
+                'role_id' => $role_id,
+                'permission_id' => $permission_id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        })->toArray();
+
+
+        // Input data ke Permission Role
+        PermissionRole::insert($insertData);
+        return redirect()->back()->with('success', 'Permissions updated successfully.');
     }
 }
